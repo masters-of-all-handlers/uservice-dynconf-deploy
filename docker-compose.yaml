@@ -1,0 +1,130 @@
+version: "2.3"
+
+services:
+
+    master:
+      build: .
+      container_name: master
+      ports:
+        - 80
+        - 443
+      
+
+    postgres-dynconfig:
+        container_name: uservice-dynconf-postgres
+        image: postgres:12
+        environment:
+          - POSTGRES_DB=uservice_dynconf
+          - POSTGRES_USER=uservice_dynconf
+          - POSTGRES_PASSWORD=password
+        ports:
+          - 6432:5432
+        volumes:
+          - ./postgresql/schemas:/docker-entrypoint-initdb.d
+          - ./.pgdata:/var/lib/postgresql/data
+        networks:
+          - postgres-dynconfig
+
+    uservice-dynconf:
+        image: ghcr.io/userver-framework/docker-userver-build-base:v1a
+        privileged: true
+        environment:
+          - POSTGRES_DB=uservice_dynconf
+          - POSTGRES_USER=uservice_dynconf
+          - POSTGRES_PASSWORD=password
+          - PREFIX=${PREFIX:-~/.local}
+          - CC
+          - CCACHE_DIR=/uservice-dynconf/.ccache
+          - CCACHE_HASHDIR
+          - CCACHE_NOHASHDIR
+          - CCACHE_PREFIX
+          - CCACHE_SIZE
+          - CMAKE_OPTS
+          - CORES_DIR=/cores
+          - CXX
+          - MAKE_OPTS
+        volumes:
+          - .:/uservice-dynconf:rw
+          - ./third_party/userver/tools/docker:/tools:ro
+        ports:
+          - 8083:8083
+        working_dir: /uservice-dynconf
+        entrypoint:
+          - /tools/run_as_user.sh
+        depends_on:
+          - postgres-dynconfig
+          - auth-service
+        networks:
+          - postgres-dynconfig
+
+
+    postgres-auth:
+        container_name: service-postgres
+        image: postgres:12
+        environment:
+          - POSTGRES_DB=auth_db-1
+          - POSTGRES_USER=user
+          - POSTGRES_PASSWORD=password
+        ports:
+          - 5432
+        volumes:
+          - ./postgresql/schemas:/docker-entrypoint-initdb.d
+          - ./.pgdata:/var/lib/postgresql/data
+        networks:
+          - postgres-auth
+        depends_on:
+          - master
+
+    auth-service:
+        image: ghcr.io/userver-framework/docker-userver-build-base:v1a
+        privileged: true
+        environment:
+          - DYN_CONFIG_SERVER_ADRESS=http://10.21.0.234:8083/
+          - POSTGRES_DB=auth_db-1
+          - POSTGRES_USER=user
+          - POSTGRES_PASSWORD=password
+          - PREFIX=${PREFIX:-~/.local}
+          - CC
+          - CCACHE_DIR=/auth/.ccache
+          - CCACHE_HASHDIR
+          - CCACHE_NOHASHDIR
+          - CCACHE_PREFIX
+          - CCACHE_SIZE
+          - CMAKE_OPTS
+          - CORES_DIR=/cores
+          - CXX
+          - MAKE_OPTS
+        volumes:
+          - .:/auth:rw
+          - ./third_party/userver/tools/docker:/tools:ro
+          - ${TC_CORES_DIR:-./.cores}:/cores:rw
+        ports:
+          - 8080:8080
+        working_dir: /auth
+        entrypoint:
+          - /tools/run_as_user.sh
+        depends_on:
+          - postgres-auth
+        networks:
+          - postgres-auth
+
+    webapp:
+      image: ghcr.io/masters-of-all-handlers/uda-frontend:latest
+      environment:
+        URL: www.example.ru
+        REPO: https://yobasystems@bitbucket.org/yobasystems/default-index.git
+      ports:
+        - 8082:80
+        - 8443:443
+      domainname: www.example.co.uk
+      restart: always
+      depends_on:
+        - master
+
+networks:
+    postgres-dynconfig:
+        driver: bridge
+
+networks:
+    postgres-auth:
+        driver: bridge
