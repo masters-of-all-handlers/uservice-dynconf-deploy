@@ -16,5 +16,6 @@ jobs:
       run: make
     - name: Watch logs
       run: docker-compose logs --tail=0 --follow
-
+    - name: Watch all
+      run: docker-compose ps
 
