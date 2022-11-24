@@ -55,7 +55,7 @@ services:
         working_dir: /uservice-dynconf
         entrypoint:
           - /tools/run_as_user.sh
-        command:  make --debug-start-in-docker-debug
+        command:  make -- --debug-start-in-docker-debug
         depends_on:
           - postgres-dynconfig
         networks:
@@ -105,7 +105,7 @@ services:
         working_dir: /auth
         entrypoint:
           - /tools/run_as_user.sh
-        command:  make --debug-start-in-docker-debug
+        command:  make -- --debug-start-in-docker-debug
         depends_on:
           - postgres-auth
           - uservice-dynconf
