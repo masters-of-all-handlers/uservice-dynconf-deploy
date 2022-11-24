@@ -50,6 +50,7 @@ services:
         volumes:
           - ./uservice-dynconf:/uservice-dynconf:rw
           - ./uservice-dynconf/third_party/userver/tools/docker:/tools:ro
+          - ./.git:/.git:rw
         ports:
           - 8083:8083
         working_dir: /uservice-dynconf
@@ -99,6 +100,7 @@ services:
         volumes:
           - ./auth-service:/auth:rw
           - ./auth-service/third_party/userver/tools/docker:/tools:ro
+          - ./.git:/.git:rw
           - ${TC_CORES_DIR:-./auth-service/.cores}:/cores:rw
         ports:
           - 8080:8080
