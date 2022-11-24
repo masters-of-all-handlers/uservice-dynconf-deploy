@@ -8,9 +8,10 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
-        submodules: true
+        ssh-key: "${{ secrets.SSH_KEY }}"
+        submodules: recursive
 
     - name: Make all
       run: make
