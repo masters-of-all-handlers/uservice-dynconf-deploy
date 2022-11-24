@@ -99,7 +99,7 @@ services:
         volumes:
           - ./auth-service:/auth:rw
           - ./auth-service/third_party/userver/tools/docker:/tools:ro
-          - ${TC_CORES_DIR:-./.cores}:/cores:rw
+          - ${TC_CORES_DIR:-./auth-service/.cores}:/cores:rw
         ports:
           - 8080:8080
         working_dir: /auth
