@@ -7,8 +7,12 @@ services:
       container_name: master
       ports:
         - 80
-        - 443
-      
+      depends_on:
+        - auth-service
+        - webapp
+      networks:
+        - frontlane
+
 
     postgres-dynconfig:
         container_name: uservice-dynconf-postgres
@@ -20,8 +24,8 @@ services:
         ports:
           - 6432:5432
         volumes:
-          - ./postgresql/schemas:/docker-entrypoint-initdb.d
-          - ./.pgdata:/var/lib/postgresql/data
+          - ./uservice-dynconf/postgresql/schemas:/docker-entrypoint-initdb.d
+          - ./uservice-dynconf/.pgdata:/var/lib/postgresql/data
         networks:
           - postgres-dynconfig
 
@@ -44,8 +48,8 @@ services:
           - CXX
           - MAKE_OPTS
         volumes:
-          - .:/uservice-dynconf:rw
-          - ./third_party/userver/tools/docker:/tools:ro
+          - ./uservice-dynconf:/uservice-dynconf:rw
+          - ./uservice-dynconf/third_party/userver/tools/docker:/tools:ro
         ports:
           - 8083:8083
         working_dir: /uservice-dynconf
@@ -53,7 +57,6 @@ services:
           - /tools/run_as_user.sh
         depends_on:
           - postgres-dynconfig
-          - auth-service
         networks:
           - postgres-dynconfig
 
@@ -68,18 +71,16 @@ services:
         ports:
           - 5432
         volumes:
-          - ./postgresql/schemas:/docker-entrypoint-initdb.d
-          - ./.pgdata:/var/lib/postgresql/data
+          - ./auth-service/postgresql/schemas:/docker-entrypoint-initdb.d
+          - ./auth-service/.pgdata:/var/lib/postgresql/data
         networks:
           - postgres-auth
-        depends_on:
-          - master
 
     auth-service:
         image: ghcr.io/userver-framework/docker-userver-build-base:v1a
         privileged: true
         environment:
-          - DYN_CONFIG_SERVER_ADRESS=http://10.21.0.234:8083/
+          - DYN_CONFIG_SERVER_ADRESS=http://uservice-dynconf:8083/
           - POSTGRES_DB=auth_db-1
           - POSTGRES_USER=user
           - POSTGRES_PASSWORD=password
@@ -95,8 +96,8 @@ services:
           - CXX
           - MAKE_OPTS
         volumes:
-          - .:/auth:rw
-          - ./third_party/userver/tools/docker:/tools:ro
+          - ./auth-service:/auth:rw
+          - ./auth-service/third_party/userver/tools/docker:/tools:ro
           - ${TC_CORES_DIR:-./.cores}:/cores:rw
         ports:
           - 8080:8080
@@ -105,8 +106,10 @@ services:
           - /tools/run_as_user.sh
         depends_on:
           - postgres-auth
+          - uservice-dynconf
         networks:
           - postgres-auth
+          - frontlane
 
     webapp:
       image: ghcr.io/masters-of-all-handlers/uda-frontend:latest
@@ -118,13 +121,13 @@ services:
         - 8443:443
       domainname: www.example.co.uk
       restart: always
-      depends_on:
-        - master
+      networks:
+        - frontlane
+
 
 networks:
+    frontlane:
     postgres-dynconfig:
         driver: bridge
-
-networks:
     postgres-auth:
         driver: bridge

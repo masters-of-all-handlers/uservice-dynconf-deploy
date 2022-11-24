@@ -1,0 +1,20 @@
+name: CI
+
+'on':
+  pull_request:
+  push:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+
+    - name: Make all
+      run: make
+    - name: Watch logs
+      run: docker-compose logs --tail=0 --follow
+
+
