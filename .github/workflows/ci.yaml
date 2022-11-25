@@ -27,4 +27,3 @@ jobs:
 
     - name: Watch all
       run: docker-compose ps
-
