@@ -50,6 +50,7 @@ services:
         volumes:
           - ./uservice-dynconf:/uservice-dynconf:rw
           - ./uservice-dynconf/third_party/userver/tools/docker:/tools:ro
+          - webdata:/var/www/:rw
           # - ./.git:/.git:rw
         ports:
           - 8083:8083
@@ -80,7 +81,7 @@ services:
 
     auth-service:
         image: ghcr.io/userver-framework/docker-userver-build-base:v1a
-        # privileged: true
+        privileged: true
         environment:
           - DYN_CONFIG_SERVER_ADRESS=http://uservice-dynconf:8083/
           - POSTGRES_DB=auth_db-1
@@ -135,3 +136,6 @@ networks:
         driver: bridge
     postgres-auth:
         driver: bridge
+
+volumes:
+    webdata:
