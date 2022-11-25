@@ -80,7 +80,7 @@ services:
 
     auth-service:
         image: ghcr.io/userver-framework/docker-userver-build-base:v1a
-        privileged: true
+        # privileged: true
         environment:
           - DYN_CONFIG_SERVER_ADRESS=http://uservice-dynconf:8083/
           - POSTGRES_DB=auth_db-1
