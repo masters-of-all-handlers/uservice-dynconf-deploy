@@ -8,6 +8,7 @@ all:
 	sudo chown -R ${USER} uservice-dynconf/.git/modules/third_party/userver/config
 	sudo chown -R ${USER} auth-service/.git/modules/third_party/userver/config
 
+	sudo chmod -R 777 auth-service
 	sudo chmod -R 777 auth-service/.git
 	sudo chmod -R 777 auth-service/.git/modules
 	sudo chmod -R 777 auth-service/.git/modules/third_party
@@ -15,6 +16,8 @@ all:
 	sudo chmod -R 777 auth-service/.git/modules/third_party/userver/config
 	git config --global --add safe.directory ./auth-service
 
+	
+	sudo chmod -R 777 uservice-dynconf
 	sudo chmod -R 777 uservice-dynconf/.git
 	sudo chmod -R 777 uservice-dynconf/.git/modules
 	sudo chmod -R 777 uservice-dynconf/.git/modules/third_party
