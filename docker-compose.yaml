@@ -6,7 +6,7 @@ services:
       build: .
       container_name: master
       ports:
-        - 80
+        - 80:80
       depends_on:
         - auth-service
         - webapp
@@ -52,8 +52,10 @@ services:
           - ./uservice-dynconf/third_party/userver/tools/docker:/tools:ro
           - webdata:/var/www/:rw
           # - ./.git:/.git:rw
-        ports:
-          - 8083:8083
+        # ports:
+        #   - 8083:8083
+        expose:
+          - 8083
         working_dir: /uservice-dynconf
         entrypoint:
           - /tools/run_as_user.sh
@@ -62,16 +64,19 @@ services:
           - postgres-dynconfig
         networks:
           - postgres-dynconfig
+          - frontlane
 
 
-    postgres-auth:
-        container_name: service-postgres
+    service-postgres:
+        container_name: service-postgres-1
         image: postgres:12
         environment:
           - POSTGRES_DB=auth_db-1
           - POSTGRES_USER=user
           - POSTGRES_PASSWORD=password
         ports:
+          - 5432
+        expose:
           - 5432
         volumes:
           - ./auth-service/postgresql/schemas:/docker-entrypoint-initdb.d
@@ -103,14 +108,16 @@ services:
           - ./auth-service/third_party/userver/tools/docker:/tools:ro
           # - ./.git:/.git:rw
           - ${TC_CORES_DIR:-./auth-service/.cores}:/cores:rw
-        ports:
-          - 8080:8080
+        # ports:
+        #   - 8080:8080
+        expose:
+          - 8080
         working_dir: /auth
         entrypoint:
           - /tools/run_as_user.sh
         command:  make -- --debug-start-in-docker-debug
         depends_on:
-          - postgres-auth
+          - service-postgres
           - uservice-dynconf
         networks:
           - postgres-auth
@@ -124,6 +131,8 @@ services:
       ports:
         - 8082:80
         - 8443:443
+      expose:
+        - 80
       domainname: www.example.co.uk
       restart: always
       networks:
