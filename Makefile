@@ -5,8 +5,8 @@ all:
 	cd uservice-dynconf && git submodule update --init
 	cd auth-service && git submodule update --init
 	users 
-	sudo chown -R $(USER) uservice-dynconf/.git/modules/third_party/userver/config
-	sudo chown -R $(USER) auth-service/.git/modules/third_party/userver/config
+	sudo chown -R ${USER} uservice-dynconf/.git/modules/third_party/userver/config
+	sudo chown -R ${USER} auth-service/.git/modules/third_party/userver/config
 
 	sudo chmod -R 777 auth-service/.git
 	sudo chmod -R 777 auth-service/.git/modules
