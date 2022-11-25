@@ -1,6 +1,0 @@
-[submodule "auth-service"]
-	path = auth-service
-	url = https://github.com/masters-of-all-handlers/auth-service.git
-[submodule "uservice-dynconf"]
-	path = uservice-dynconf
-	url = https://github.com/masters-of-all-handlers/uservice-dynconf.git

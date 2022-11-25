@@ -50,13 +50,13 @@ services:
         volumes:
           - ./uservice-dynconf:/uservice-dynconf:rw
           - ./uservice-dynconf/third_party/userver/tools/docker:/tools:ro
-          - ./.git:/.git:rw
+          # - ./.git:/.git:rw
         ports:
           - 8083:8083
         working_dir: /uservice-dynconf
         entrypoint:
           - /tools/run_as_user.sh
-        command:  make -- --debug-start-in-docker-debug
+        command: make -- --debug-start-in-docker-debug
         depends_on:
           - postgres-dynconfig
         networks:
@@ -100,7 +100,7 @@ services:
         volumes:
           - ./auth-service:/auth:rw
           - ./auth-service/third_party/userver/tools/docker:/tools:ro
-          - ./.git:/.git:rw
+          # - ./.git:/.git:rw
           - ${TC_CORES_DIR:-./auth-service/.cores}:/cores:rw
         ports:
           - 8080:8080
