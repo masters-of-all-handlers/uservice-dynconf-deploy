@@ -7,6 +7,8 @@ services:
       container_name: master
       ports:
         - 80:80
+        - 8080:8080
+#       - 8083:8083
       depends_on:
         - auth-service
         - webapp
@@ -50,10 +52,10 @@ services:
         volumes:
           - ./uservice-dynconf:/uservice-dynconf:rw
           - ./uservice-dynconf/third_party/userver/tools/docker:/tools:ro
-          - webdata:/var/www/:rw
-          # - ./.git:/.git:rw
-        # ports:
-        #   - 8083:8083
+          - ./uservice-dynconf/public:/var/www
+          #- webdata:/var/www/:rw
+        ports:
+          - 8083:8083
         expose:
           - 8083
         working_dir: /uservice-dynconf
@@ -128,9 +130,6 @@ services:
       environment:
         URL: www.example.ru
         REPO: https://yobasystems@bitbucket.org/yobasystems/default-index.git
-      ports:
-        - 8082:80
-        - 8443:443
       expose:
         - 80
       domainname: www.example.co.uk
